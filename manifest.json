@@ -1,0 +1,72 @@
+{
+  "name": "Headphones",
+  "id": "headphones",
+  "description": {
+    "en": "Automatic music downloader",
+    "fr": "Téléchargement automatisé de musique"
+  },
+  "license": "GPL-3",
+  "maintainer": {
+    "name": "Snipees",
+    "email": "snipees@wareziens.net",
+    "url": "https://github.com/Snipees"
+  },
+  "multi_instance": "false",
+  "arguments": {
+    "install": [
+      {
+        "name": "domain",
+        "ask": {
+          "en": "Choose a domain for Headphones",
+          "fr": "Choisissez un domaine pour Headphones"
+        },
+        "example": "mydomain.org"
+      },
+      {
+        "name": "path",
+        "ask": {
+          "en": "Choose a path for Headphones",
+          "fr": "Choisissez un chemin pour Headphones"
+        },
+        "example": "/headphones",
+        "default": "/headphones"
+      },
+      {
+        "name": "host",
+        "ask": {
+          "en": "Choose host for app (keep 127.0.0.1 for localhost installation)",
+          "fr": "Choisissez un hôte pour l'application (laissez 127.0.0.1 pour une installation locale)"
+        },
+        "example": "192.168.1.100",
+        "default": "127.0.0.1"
+      },
+      {
+        "name": "port",
+        "ask": {
+          "en": "Choose the listening port of the app (not used for localhost installation)",
+          "fr": "Choisissez le port d'écoute de l'application (non utilisé pour une installation locale)"
+        },
+        "example": "8181",
+        "default": "8181"
+      },
+	  {
+        "name": "fork",
+        "ask": {
+          "en": "Source URL of GIT to use (used only for localhost installation)",
+          "fr": "URL du GIT source à utiliser (uniquement pour une installation locale)"
+        },
+        "example": "https://github.com/Snipees/headphones",
+        "default": "https://github.com/rembo10/headphones"
+      },
+	  {
+        "name": "options",
+        "ask": {
+          "en": "Choose a downloader to configure (used only for localhost installation)",
+          "fr": "Choisissez un client de téléchargement (uniquement pour une installation locale)"
+        },
+        "choices": ["None", "Transmission"],
+        "default": "None"
+      }
+    ]
+  }
+}

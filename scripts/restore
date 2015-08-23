@@ -1,0 +1,55 @@
+#!/bin/bash
+
+# Set variables
+app_id=headphones
+app_user=headphones
+app_install_dir=/opt/yunohost/$app_id
+app_data_dir=/home/yunohost.app/$app_id
+app_host=$(sudo yunohost app setting $app_id host)
+app_domain=$(sudo yunohost app setting $app_id domain)
+
+# The parameter $1 is the uncompressed restore directory location
+app_backup_dir=$1/apps/$app_id
+
+
+# Restore files if localhost installation
+if [[ $app_host == "127.0.0.1" ]]; then
+
+	# Kill App
+	sudo service $app_id stop
+	sudo killall $app_id
+
+	# Restore sources
+	sudo cp -a $app_backup_dir/sources/. $app_install_dir
+
+	# Restore data
+	sudo cp -a $app_backup_dir/data/. $app_data_dir
+	
+	# Restore daemon config
+	sudo cp -a $app_backup_dir/conf/$app_id.default /etc/default/$app_id 
+	sudo cp -a $app_backup_dir/conf/$app_id.init /etc/init.d/$app_id
+	
+	# Set rights
+	sudo chown -R $app_user $app_install_dir
+	sudo chown -R $app_user $app_data_dir
+	sudo chmod +x /etc/init.d/$app_id
+	sudo chmod +x -R $app_install_dir
+	sudo chmod +x -R $app_data_dir
+	
+	# Start daemon at boot
+	sudo update-rc.d $app_id defaults
+	
+	# Reload daemon
+	sudo service $app_id restart
+	
+fi
+
+
+# Restore Nginx and YunoHost parameters
+sudo cp -a $app_backup_dir/yunohost/. /etc/yunohost/apps/$app_id
+sudo cp -a $app_backup_dir/nginx.conf /etc/nginx/conf.d/$app_domain.d/$app_id.conf
+
+# Reload Nginx and regenerate SSOwat conf
+sudo service nginx reload
+echo $?
+sudo yunohost app ssowatconf

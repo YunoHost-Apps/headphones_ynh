@@ -1,0 +1,39 @@
+#!/bin/bash
+
+# Set variables
+app_id=headphones
+app_user=headphones
+app_install_dir=/opt/yunohost/$app_id
+app_init_file=$app_install_dir/init-scripts/init.ubuntu
+app_host=$(sudo yunohost app setting $app_id host)
+
+# Make upgrade if localhost installation
+if [[ $app_host == "127.0.0.1" ]]; then
+
+	# Kill App
+	sudo service $app_id stop
+	sudo killall $app_id
+	
+	# Upgrade to the latest version of App using the fork
+	cd $app_install_dir && sudo git pull
+	cd -
+
+	# Upgrade dependencies
+	
+	# Update init file
+	sudo cp -a $app_init_file /etc/init.d/$app_id
+	
+	# Set rights
+	sudo chown -R $app_user $app_install_dir
+	sudo chmod +x /etc/init.d/$app_id
+	sudo chmod +x -R $app_install_dir
+	
+	# Reload daemon
+	sudo service $app_id restart
+	
+fi
+
+
+# Reload Nginx
+sudo service nginx reload
+
