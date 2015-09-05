@@ -16,9 +16,8 @@ Otherwise the script sets a reverse-proxy to a remote instance.
 - Use **Install software** option from Yunohost admin panel
 - Find textbox tagged as **Install custom App from github**
 - Copy and paste: https://github.com/Snipees/headphones_ynh
-- Choose an host for the instance, keep ***127.0.0.1*** to make a local installation
-- Choose the listening port, local installation will use this port but will not be reachable
-- Choose a fork as sources for local installation
+- Choose the method installation: *local* or *remote* (as described above)
+- Answer the required questions to the selected method
 
 
 ### More information about:

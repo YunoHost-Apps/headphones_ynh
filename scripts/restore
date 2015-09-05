@@ -1,21 +1,23 @@
 #!/bin/bash
 
-# Set variables
+# Common variable declaration
 app_id=headphones
 app_user=headphones
-app_install_dir=/opt/yunohost/$app_id
-app_data_dir=/home/yunohost.app/$app_id
-app_host=$(sudo yunohost app setting $app_id host)
-app_domain=$(sudo yunohost app setting $app_id domain)
+app_install_dir="/opt/yunohost/${app_id}"
+app_data_dir="/home/yunohost.app/${app_id}"
+
+# Retrieve arguments
+app_method="$(sudo yunohost app setting ${app_id} method)"
+app_domain="$(sudo yunohost app setting ${app_id} domain)"
 
 # The parameter $1 is the uncompressed restore directory location
-app_backup_dir=$1/apps/$app_id
+app_backup_dir="$1/apps/${app_id}"
 
 
 # Restore files if localhost installation
-if [[ $app_host == "127.0.0.1" ]]; then
+if [[ $app_method == "LOCAL"* ]]; then
 
-	# Kill App
+	# Kill app
 	sudo service $app_id stop
 	sudo killall $app_id
 
@@ -51,5 +53,4 @@ sudo cp -a $app_backup_dir/nginx.conf /etc/nginx/conf.d/$app_domain.d/$app_id.co
 
 # Reload Nginx and regenerate SSOwat conf
 sudo service nginx reload
-echo $?
 sudo yunohost app ssowatconf

@@ -32,19 +32,28 @@
         "default": "/headphones"
       },
       {
-        "name": "host",
+      	"name": "public",
+      	"ask": {
+          "en": "Is it a public application ?",
+          "fr": "Est-ce une application publique ?"
+      	},
+      	"choices": ["Yes", "No"],
+      	"default": "No"
+      },
+      {
+        "name": "method",
         "ask": {
-          "en": "Choose host for app (keep 127.0.0.1 for localhost installation)",
-          "fr": "Choisissez un hôte pour l'application (laissez 127.0.0.1 pour une installation locale)"
+          "en": "Choose installation method",
+          "fr": "Choisissez le type d'installation"
         },
-        "example": "192.168.1.100",
-        "default": "127.0.0.1"
+      	"choices": ["LOCAL", "REMOTE"],
+      	"default": "LOCAL"
       },
       {
         "name": "port",
         "ask": {
-          "en": "Choose the listening port of the app (not used for localhost installation)",
-          "fr": "Choisissez le port d'écoute de l'application (non utilisé pour une installation locale)"
+          "en": "LOCAL: Choose the listening port of the app",
+          "fr": "LOCAL: Choisissez le port d'écoute de l'application"
         },
         "example": "8181",
         "default": "8181"
@@ -52,8 +61,8 @@
 	  {
         "name": "fork",
         "ask": {
-          "en": "Source URL of GIT to use (used only for localhost installation)",
-          "fr": "URL du GIT source à utiliser (uniquement pour une installation locale)"
+          "en": "LOCAL: Source URL of GIT to use",
+          "fr": "LOCAL: URL du GIT source à utiliser"
         },
         "example": "https://github.com/Snipees/headphones",
         "default": "https://github.com/rembo10/headphones"
@@ -61,11 +70,31 @@
 	  {
         "name": "options",
         "ask": {
-          "en": "Choose a downloader to configure (used only for localhost installation)",
-          "fr": "Choisissez un client de téléchargement (uniquement pour une installation locale)"
+          "en": "LOCAL: Choose a downloader to configure",
+          "fr": "LOCAL: Choisissez un client de téléchargement"
         },
         "choices": ["None", "Transmission"],
         "default": "None"
+      },
+      {
+        "name": "host",
+        "ask": {
+          "en": "REMOTE: Specify URL for the host",
+          "fr": "REMOTE: Indiquez l'URL de l'hôte"
+        },
+        "example": "http://192.168.1.100:8888/myapp",
+        "default": "http://"
+      }
+    ],
+    "remove": [
+      {
+        "name": "data",
+        "ask": {
+          "en": "Would you like to keep data files ?",
+          "fr": "Souhaitez-vous conserver les données ?"
+        },
+        "choices": ["Yes", "No"],
+        "default": "Yes"
       }
     ]
   }

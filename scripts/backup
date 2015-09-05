@@ -1,21 +1,23 @@
 #!/bin/bash
 
-# Set variables
+# Common variable declaration
 app_id=headphones
 app_user=headphones
-app_install_dir=/opt/yunohost/$app_id
-app_data_dir=/home/yunohost.app/$app_id
-app_host=$(sudo yunohost app setting $app_id host)
-app_domain=$(sudo yunohost app setting $app_id domain)
+app_install_dir="/opt/yunohost/${app_id}"
+app_data_dir="/home/yunohost.app/${app_id}"
+
+# Retrieve arguments
+app_method="$(sudo yunohost app setting ${app_id} method)"
+app_domain="$(sudo yunohost app setting ${app_id} domain)"
 
 # The parameter $1 is the backup directory location
 # which will be compressed afterward
-app_backup_dir=$1/apps/$app_id
-mkdir -p $app_backup_dir
+app_backup_dir="$1/apps/${app_id}"
+sudo mkdir -p $app_backup_dir
 
 
 # Backup files if localhost installation
-if [[ $app_host == "127.0.0.1" ]]; then
+if [[ $app_method == "LOCAL"* ]]; then
 
 	# Backup sources
 	sudo cp -a $app_install_dir/. $app_backup_dir/sources

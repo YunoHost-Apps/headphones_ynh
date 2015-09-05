@@ -1,32 +1,41 @@
 #!/bin/bash
 
-# Set variables
+# Common variable declaration
 app_id=headphones
 app_user=headphones
-app_install_dir=/opt/yunohost/$app_id
-app_data_dir=/home/yunohost.app/$app_id
-app_logs_dir=/var/log/$app_id
-app_host=$(sudo yunohost app setting $app_id host)
-app_domain=$(sudo yunohost app setting $app_id domain)
+app_install_dir="/opt/yunohost/${app_id}"
+app_data_dir="/home/yunohost.app/${app_id}"
+app_logs_dir="/var/log/${app_id}"
+
+# Retrieve arguments
+app_method="$(sudo yunohost app setting ${app_id} method)"
+app_domain="$(sudo yunohost app setting ${app_id} domain)"
+keep_data=$1
 
 
 # Remove files if localhost installation
-if [[ $app_host == "127.0.0.1" ]]; then
+if [[ $app_method == "LOCAL"* ]]; then
 
-	# Kill App and remove from boot
+	# Kill app and remove from boot
 	sudo service $app_id stop
 	sudo killall $app_id
 	sudo update-rc.d $app_id remove
 	
-	# Delete App user
+	# Delete app user
 	sudo deluser $app_user
 	
 	# Remove sources
 	sudo rm -rf $app_install_dir
 
+	# Remove logs
+	if [[ $app_logs_dir != "$app_data_dir"* ]]; then
+		sudo rm -rf $app_logs_dir
+	fi
+
 	# Remove data
-	sudo rm -rf $app_data_dir
-	sudo rm -rf $app_logs_dir
+	if [[ $keep_data == "No" ]]; then
+		sudo rm -rf $app_data_dir
+	fi
 	
 	# Remove daemon config
 	sudo rm -f /etc/init.d/$app_id
@@ -39,6 +48,9 @@ fi
 # Remove Nginx parameters
 sudo rm -f /etc/nginx/conf.d/$app_domain.d/$app_id.conf
 
+# Remove Yunohost service
+sudo yunohost service remove $app_id
+
 # Reload Nginx and update Yunohost
 sudo service nginx reload
-sudo yunohost service remove $app_id
+sudo yunohost app ssowatconf

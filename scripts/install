@@ -7,21 +7,32 @@
 # Retrieve arguments
 app_domain=$1
 app_path=$2
-app_host=$3
-app_port=$4
-app_fork=$5
-app_opts=$6
+app_public=$3
+app_method=$4
+app_port=$5
+app_fork=$6
+app_opts=$7
+app_host=$8
 
-# Set variables
+# Basic variable declaration
+BASEDIR="$(dirname "$(pwd)")"
+
+# Common variable declaration
 app_id=headphones
 app_user=headphones
-app_install_dir=/opt/yunohost/$app_id
-app_data_dir=/home/yunohost.app/$app_id
-app_logs_dir=/var/log/$app_id
-app_pid_file=/var/run/$app_id/$app_id.pid
-app_config_file=$app_data_dir/config.ini
-app_init_file=$app_install_dir/init-scripts/init.ubuntu
-app_python_bin=/usr/bin/python
+app_local_host="127.0.0.1"
+app_python_bin="/usr/bin/python"
+## Destinations definitions
+app_install_dir="/opt/yunohost/${app_id}"
+app_data_dir="/home/yunohost.app/${app_id}"
+app_logs_dir="/var/log/${app_id}"
+app_config_file="${app_data_dir}/config.ini"
+app_pid_file="/var/run/${app_id}/${app_id}.pid"
+## Sources definitions
+app_src_conf="$BASEDIR/conf/${app_id}.conf"
+app_src_dfts="$BASEDIR/conf/${app_id}.defaults"
+app_src_init="$BASEDIR/conf/${app_id}.init"
+app_src_nginx_conf="$BASEDIR/conf/nginx.conf"
 
 
 # Check domain/path availability
@@ -30,22 +41,22 @@ if [[ ! $? -eq 0 ]]; then
 	exit 1
 fi
 
-# Check port availability
-sudo yunohost app checkport $app_port
-if [[ ! $? -eq 0 ]]; then
-	exit 1
-fi
-
 
 # Make install if localhost installation
-if [[ $app_host == "127.0.0.1" ]]; then
+if [[ $app_method == "LOCAL"* ]]; then
+
+	# Check port availability
+	sudo yunohost app checkport $app_port
+	if [[ ! $? -eq 0 ]]; then
+		exit 1
+	fi
 	
 	# Make directories
 	sudo mkdir -p $app_logs_dir
 	sudo mkdir -p $app_data_dir
 	sudo mkdir -p $app_install_dir
 	
-	# Install the latest version of App using the fork
+	# Install latest version of app using the fork
 	sudo apt-get install -y git-core
 	sudo git clone $app_fork $app_install_dir
 	
@@ -57,26 +68,26 @@ if [[ $app_host == "127.0.0.1" ]]; then
 		sudo bash -c "source $app_install_dir/bin/activate && pip install cheetah"
 	fi
 	
-	# Create App user
-	id -u $app_user &>/dev/null || sudo useradd --home-dir $app_install_dir --shell /bin/false $app_user
+	# Create app user
+	id -u $app_user &>/dev/null || sudo useradd --home-dir $app_data_dir --shell /bin/false $app_user
 	
 	# Configure daemon
-	sudo sed -i "s@USERTOCHANGE@$app_user@g" ../conf/$app_id
-	sudo sed -i "s@APPDIRTOCHANGE@$app_install_dir@g" ../conf/$app_id
-	sudo sed -i "s@DATADIRTOCHANGE@$app_data_dir@g" ../conf/$app_id
-	sudo sed -i "s@PIDFILETOCHANGE@$app_pid_file@g" ../conf/$app_id
-	sudo sed -i "s@PYTBINTOCHANGE@$app_python_bin@g" ../conf/$app_id
-	sudo sed -i "s@OPTSTOCHANGE@$app_config_file@g" ../conf/$app_id
-	sudo sed -i "s@PORTTOCHANGE@$app_port@g" ../conf/$app_id
-	sudo cp -a ../conf/$app_id /etc/default/$app_id
-	sudo cp -a $app_init_file /etc/init.d/$app_id
+	sudo sed -i "s@USERTOCHANGE@$app_user@g" $app_src_dfts
+	sudo sed -i "s@APPDIRTOCHANGE@$app_install_dir@g" $app_src_dfts
+	sudo sed -i "s@DATADIRTOCHANGE@$app_data_dir@g" $app_src_dfts
+	sudo sed -i "s@PIDFILETOCHANGE@$app_pid_file@g" $app_src_dfts
+	sudo sed -i "s@PYTBINTOCHANGE@$app_python_bin@g" $app_src_dfts
+	sudo sed -i "s@OPTSTOCHANGE@$app_config_file@g" $app_src_dfts
+	sudo sed -i "s@PORTTOCHANGE@$app_port@g" $app_src_dfts
+	sudo cp -a $app_src_dfts /etc/default/$app_id
+	sudo cp -a $app_src_init /etc/init.d/$app_id
 	
-	# Configure App
-	sudo sed -i "s@PATHTOCHANGE@$app_path@g" ../conf/config.ini
-	sudo sed -i "s@PORTTOCHANGE@$app_port@g" ../conf/config.ini
-	sudo sed -i "s@APPDIRTOCHANGE@$app_install_dir@g" ../conf/config.ini
-	sudo sed -i "s@LOGSDIRTOCHANGE@$app_logs_dir@g" ../conf/config.ini
-	sudo cp -a ../conf/config.ini $app_config_file
+	# Configure app
+	sudo sed -i "s@PATHTOCHANGE@$app_path@g" $app_src_conf
+	sudo sed -i "s@PORTTOCHANGE@$app_port@g" $app_src_conf
+	sudo sed -i "s@APPDIRTOCHANGE@$app_install_dir@g" $app_src_conf
+	sudo sed -i "s@LOGSDIRTOCHANGE@$app_logs_dir@g" $app_src_conf
+	sudo cp -a $app_src_conf $app_config_file
 	
 	# Configure specifics options
 	case "$app_opts" in
@@ -85,14 +96,14 @@ if [[ $app_host == "127.0.0.1" ]]; then
 		ref_field=(download-dir rpc-bind-address rpc-port rpc-url rpc-username rpc-password)
 		for i in ${ref_field[*]}; do ref_value+=$(sudo sed -n -e "/$i/ s/.*\: *//p" $ref_file | sed 's/["*,]//g'); done
 		ref_value=($ref_value)
-		sudo sed -i "s@download_torrent_dir =.*@download_torrent_dir = ${ref_value[0]}@g" ../conf/config.ini
-		sudo sed -i "s@transmission_host =.*@transmission_host = http://${ref_value[1]}:${ref_value[2]}${ref_value[3]}@g" ../conf/config.ini
-		sudo sed -i "s@transmission_username =.*@transmission_username = ${ref_value[4]}@g" ../conf/config.ini
-		sudo sed -i "s@transmission_password =.*@transmission_password = ${ref_value[5]}@g" ../conf/config.ini
-		sudo sed -i "s@torrent_downloader =.*@torrent_downloader = 1@g" ../conf/config.ini
-		sudo sed -i "s@keep_torrent_files =.*@keep_torrent_files = 1@g" ../conf/config.ini
-		sudo sed -i "s@prefer_torrents =.*@prefer_torrents = 1@g" ../conf/config.ini
-		sudo cp -a ../conf/config.ini $app_config_file
+		sudo sed -i "s@download_torrent_dir =.*@download_torrent_dir = ${ref_value[0]}@g" $app_src_conf
+		sudo sed -i "s@transmission_host =.*@transmission_host = http://${ref_value[1]}:${ref_value[2]}${ref_value[3]}@g" $app_src_conf
+		sudo sed -i "s@transmission_username =.*@transmission_username = ${ref_value[4]}@g" $app_src_conf
+		sudo sed -i "s@transmission_password =.*@transmission_password = ${ref_value[5]}@g" $app_src_conf
+		sudo sed -i "s@torrent_downloader =.*@torrent_downloader = 1@g" $app_src_conf
+		sudo sed -i "s@keep_torrent_files =.*@keep_torrent_files = 1@g" $app_src_conf
+		sudo sed -i "s@prefer_torrents =.*@prefer_torrents = 1@g" $app_src_conf
+		sudo cp -a $app_src_conf $app_config_file
 		;;
 	esac
 	
@@ -106,13 +117,16 @@ if [[ $app_host == "127.0.0.1" ]]; then
 	sudo chmod +x -R $app_logs_dir
 	
 	# Add service to YunoHost's monitoring
-	sudo yunohost service add $app_id --log $app_logs_dir/ --status "ps aux | grep $app_id | grep -v grep"
+	sudo yunohost service add $app_id --log $app_logs_dir --status "ps aux | grep $app_id | grep -v grep"
 	
 	# Start daemon at boot
 	sudo update-rc.d $app_id defaults
 	
-	# Reload daemon
-	sudo service $app_id restart
+	# Start service
+	sudo service $app_id start
+	
+	# Set proxy host variable
+	app_host="http://${app_local_host}:${app_port}${app_path%/}"
 	
 fi
 
@@ -121,15 +135,21 @@ fi
 app_path=${app_path%/}
 
 # Configure Nginx 
-sudo sed -i "s@IPTOCHANGE@$app_host@g" ../conf/nginx.conf
-sudo sed -i "s@PORTTOCHANGE@$app_port@g" ../conf/nginx.conf
-sudo sed -i "s@PATHTOCHANGE@$app_path@g" ../conf/nginx.conf
-sudo cp ../conf/nginx.conf /etc/nginx/conf.d/$app_domain.d/$app_id.conf
+sudo sed -i "s@PATHTOCHANGE@$app_path@g" $app_src_nginx_conf
+sudo sed -i "s@HOSTTOCHANGE@$app_host@g" $app_src_nginx_conf
+sudo cp $app_src_nginx_conf /etc/nginx/conf.d/$app_domain.d/$app_id.conf
+
+# If app is public, add url to SSOWat conf as skipped_uris
+if [[ $app_public == "Yes" ]]; then
+	# unprotected_uris allows SSO credentials to be passed anyway.
+	sudo yunohost app setting $app_id unprotected_uris -v "/"
+fi
 	
-# Store used IP for upgrades
-sudo yunohost app setting $app_id host -v $app_host
+# Save app settings
+sudo yunohost app setting $app_id public -v "$app_public"
+sudo yunohost app setting $app_id method -v "$app_method"
+sudo yunohost app setting $app_id host -v "$app_host"
 
 # Reload Nginx and regenerate SSOwat conf
 sudo service nginx reload
-echo $?
 sudo yunohost app ssowatconf
