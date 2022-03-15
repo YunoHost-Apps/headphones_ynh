@@ -87,6 +87,7 @@ ynh_setup_source --dest_dir="$final_path"
 chmod 750 "$final_path"
 chmod -R o-rwx "$final_path"
 chown -R $app:www-data "$final_path"
+chmod +x "$final_path/Headphones.py"
 
 #=================================================
 # NGINX CONFIGURATION
@@ -113,12 +114,12 @@ chown -R $app:www-data "$datadir"
 #=================================================
 # ADD A CONFIGURATION
 #=================================================
-# ynh_script_progression --message="Adding a configuration file..." --time --weight=1
+ynh_script_progression --message="Adding a configuration file..." --time --weight=1
 
-# ynh_add_config --template="some_config_file" --destination="$final_path/some_config_file"
+ynh_add_config --template="../conf/headphones.defaults" --destination="/etc/default/headphones"
 
-# chmod 400 "$final_path/some_config_file"
-# chown $app:$app "$final_path/some_config_file"
+#chmod 400 "$final_path/some_config_file"
+#chown $app:$app "$final_path/some_config_file"
 
 #=================================================
 # SETUP SYSTEMD
