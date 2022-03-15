@@ -118,8 +118,8 @@ ynh_script_progression --message="Adding a configuration file..." --time --weigh
 
 ynh_add_config --template="../conf/headphones.defaults" --destination="/etc/default/headphones"
 
-#chmod 400 "$final_path/some_config_file"
-#chown $app:$app "$final_path/some_config_file"
+#chmod 400 "/etc/default/headphones"
+#chown $app:$app "/etc/default/headphones"
 
 #=================================================
 # SETUP SYSTEMD
