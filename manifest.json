@@ -1,101 +1,48 @@
 {
-  "name": "Headphones",
-  "id": "headphones",
-  "description": {
-    "en": "Automatic music downloader",
-    "fr": "Téléchargement automatisé de musique"
-  },
-  "license": "GPL-3",
-  "maintainer": {
-    "name": "Snipees",
-    "email": "snipees@wareziens.net",
-    "url": "https://github.com/Snipees"
-  },
-  "multi_instance": "false",
-  "arguments": {
-    "install": [
-      {
-        "name": "domain",
-        "ask": {
-          "en": "Choose a domain for Headphones",
-          "fr": "Choisissez un domaine pour Headphones"
-        },
-        "example": "mydomain.org"
-      },
-      {
-        "name": "path",
-        "ask": {
-          "en": "Choose a path for Headphones",
-          "fr": "Choisissez un chemin pour Headphones"
-        },
-        "example": "/headphones",
-        "default": "/headphones"
-      },
-      {
-      	"name": "public",
-      	"ask": {
-          "en": "Is it a public application ?",
-          "fr": "Est-ce une application publique ?"
-      	},
-      	"choices": ["Yes", "No"],
-      	"default": "No"
-      },
-      {
-        "name": "method",
-        "ask": {
-          "en": "Choose installation method",
-          "fr": "Choisissez le type d'installation"
-        },
-      	"choices": ["LOCAL", "REMOTE"],
-      	"default": "LOCAL"
-      },
-      {
-        "name": "port",
-        "ask": {
-          "en": "LOCAL: Choose the listening port of the app",
-          "fr": "LOCAL: Choisissez le port d'écoute de l'application"
-        },
-        "example": "8181",
-        "default": "8181"
-      },
-	  {
-        "name": "fork",
-        "ask": {
-          "en": "LOCAL: Source URL of GIT to use",
-          "fr": "LOCAL: URL du GIT source à utiliser"
-        },
-        "example": "https://github.com/Snipees/headphones",
-        "default": "https://github.com/rembo10/headphones"
-      },
-	  {
-        "name": "options",
-        "ask": {
-          "en": "LOCAL: Choose a downloader to configure",
-          "fr": "LOCAL: Choisissez un client de téléchargement"
-        },
-        "choices": ["None", "Transmission"],
-        "default": "None"
-      },
-      {
-        "name": "host",
-        "ask": {
-          "en": "REMOTE: Specify URL for the host",
-          "fr": "REMOTE: Indiquez l'URL de l'hôte"
-        },
-        "example": "http://192.168.1.100:8888/myapp",
-        "default": "http://"
-      }
+    "name": "Headphones",
+    "id": "headphones",
+    "packaging_format": 1,
+    "description": {
+        "en": "Automated music downloader for NZB and Torrent",
+        "fr": "Automated music downloader for NZB and Torrent"
+    },
+    "version": "0.6.0~ynh1",
+    "url": "https://github.com/rembo10/headphones",
+    "upstream": {
+        "license": "free",
+        "website": "https://github.com/rembo10/headphones",
+        "userdoc": "https://github.com/rembo10/headphones/wiki/Usage-guide",
+        "code": "https://github.com/rembo10/headphones"
+    },
+    "license": "free",
+    "maintainer": {
+        "name": "John doe",
+        "email": "john.doe@example.com"
+    },
+    "requirements": {
+        "yunohost": ">= 4.3.0"
+    },
+    "multi_instance": true,
+    "services": [
+        "nginx"
     ],
-    "remove": [
-      {
-        "name": "data",
-        "ask": {
-          "en": "Would you like to keep data files ?",
-          "fr": "Souhaitez-vous conserver les données ?"
-        },
-        "choices": ["Yes", "No"],
-        "default": "Yes"
-      }
-    ]
-  }
+    "arguments": {
+        "install" : [
+            {
+                "name": "domain",
+                "type": "domain"
+            },
+            {
+                "name": "path",
+                "type": "path",
+                "example": "/headphones",
+                "default": "/headphones"
+            },
+            {
+                "name": "is_public",
+                "type": "boolean",
+                "default": true
+            }
+        ]
+    }
 }
