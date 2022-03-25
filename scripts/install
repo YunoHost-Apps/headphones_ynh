@@ -1,155 +1,192 @@
 #!/bin/bash
 
-#debug commands
-#exec > >(tee /tmp/debug-install.log)
-#exec 2>&1
+#=================================================
+# GENERIC START
+#=================================================
+# IMPORT GENERIC HELPERS
+#=================================================
 
-# Retrieve arguments
-app_domain=$1
-app_path=$2
-app_public=$3
-app_method=$4
-app_port=$5
-app_fork=$6
-app_opts=$7
-app_host=$8
+source _common.sh
+source /usr/share/yunohost/helpers
 
-# Basic variable declaration
-BASEDIR="$(dirname "$(pwd)")"
+#=================================================
+# MANAGE SCRIPT FAILURE
+#=================================================
 
-# Common variable declaration
-app_id=headphones
-app_user=headphones
-app_local_host="127.0.0.1"
-app_python_bin="/usr/bin/python"
-## Destinations definitions
-app_install_dir="/opt/yunohost/${app_id}"
-app_data_dir="/home/yunohost.app/${app_id}"
-app_logs_dir="/var/log/${app_id}"
-app_config_file="${app_data_dir}/config.ini"
-app_pid_file="/var/run/${app_id}/${app_id}.pid"
-## Sources definitions
-app_src_conf="$BASEDIR/conf/${app_id}.conf"
-app_src_dfts="$BASEDIR/conf/${app_id}.defaults"
-app_src_init="$BASEDIR/conf/${app_id}.init"
-app_src_nginx_conf="$BASEDIR/conf/nginx.conf"
+ynh_clean_setup () {
+	ynh_clean_check_starting
+}
+# Exit if an error occurs during the execution of the script
+ynh_abort_if_errors
 
+#=================================================
+# RETRIEVE ARGUMENTS FROM THE MANIFEST
+#=================================================
 
-# Check domain/path availability
-sudo yunohost app checkurl $app_domain$app_path -a $app_id
-if [[ ! $? -eq 0 ]]; then
-	exit 1
+domain=$YNH_APP_ARG_DOMAIN
+path_url=$YNH_APP_ARG_PATH
+is_public=$YNH_APP_ARG_IS_PUBLIC
+
+app=$YNH_APP_INSTANCE_NAME
+
+#=================================================
+# CHECK IF THE APP CAN BE INSTALLED WITH THESE ARGS
+#=================================================
+ynh_script_progression --message="Validating installation parameters..."
+
+final_path=/var/www/$app
+test ! -e "$final_path" || ynh_die --message="This path already contains a folder"
+
+# Register (book) web path
+ynh_webpath_register --app=$app --domain=$domain --path_url=$path_url
+
+#=================================================
+# STORE SETTINGS FROM MANIFEST
+#=================================================
+ynh_script_progression --message="Storing installation settings..."
+
+ynh_app_setting_set --app=$app --key=domain --value=$domain
+ynh_app_setting_set --app=$app --key=path --value=$path_url
+
+#=================================================
+# STANDARD MODIFICATIONS
+#=================================================
+# FIND AND OPEN A PORT
+#=================================================
+ynh_script_progression --message="Finding an available port..."
+
+# Find an available port
+port=$(ynh_find_port --port=8095)
+ynh_app_setting_set --app=$app --key=port --value=$port
+
+#=================================================
+# INSTALL DEPENDENCIES
+#=================================================
+ynh_script_progression --message="Installing dependencies..."
+
+ynh_install_app_dependencies $pkg_dependencies
+
+#=================================================
+# CREATE DEDICATED USER
+#=================================================
+ynh_script_progression --message="Configuring system user..."
+
+# Create a system user
+ynh_system_user_create --username=$app --home_dir="$final_path"
+
+#=================================================
+# DOWNLOAD, CHECK AND UNPACK SOURCE
+#=================================================
+ynh_script_progression --message="Setting up source files..."
+
+ynh_app_setting_set --app=$app --key=final_path --value=$final_path
+# Download, check integrity, uncompress and patch the source from app.src
+ynh_setup_source --dest_dir="$final_path"
+
+chmod 750 "$final_path"
+chmod -R o-rwx "$final_path"
+chown -R $app:$app "$final_path"
+chmod +x "$final_path/Headphones.py"
+
+#=================================================
+# NGINX CONFIGURATION
+#=================================================
+ynh_script_progression --message="Configuring NGINX web server..."
+
+# Create a dedicated NGINX config
+ynh_add_nginx_config
+
+#=================================================
+# SPECIFIC SETUP
+#=================================================
+# INSTALL PYTHON DEPENDENCIES
+#=================================================
+ynh_script_progression --message="Installing Python dependencies..."
+
+python3 -m venv $final_path/venv
+
+#=================================================
+# CREATE DATA DIRECTORY
+#=================================================
+ynh_script_progression --message="Creating a data directory..."
+
+datadir=/home/yunohost.app/$app
+ynh_app_setting_set --app=$app --key=datadir --value=$datadir
+
+mkdir -p $datadir
+
+chmod 750 "$datadir"
+chmod -R o-rwx "$datadir"
+chown -R $app:$app "$datadir"
+
+#=================================================
+# ADD A CONFIGURATION
+#=================================================
+ynh_script_progression --message="Adding a configuration file..."
+
+mkdir -p "/etc/$app"
+ynh_add_config --template="../conf/headphones.ini" --destination="/etc/$app/$app.ini"
+
+chmod 600 "/etc/$app/$app.ini"
+chown $app:$app "/etc/$app/$app.ini"
+
+#=================================================
+# SETUP SYSTEMD
+#=================================================
+ynh_script_progression --message="Configuring a systemd service..."
+
+# Create a dedicated systemd config
+ynh_add_systemd_config
+
+#=================================================
+# GENERIC FINALIZATION
+#=================================================
+# SETUP LOGROTATE
+#=================================================
+ynh_script_progression --message="Configuring log rotation..."
+
+mkdir -p "/var/log/$app"
+chown -R $app:$app "/var/log/$app"
+# Use logrotate to manage application logfile(s)
+ynh_use_logrotate
+
+#=================================================
+# INTEGRATE SERVICE IN YUNOHOST
+#=================================================
+ynh_script_progression --message="Integrating service in YunoHost..."
+
+yunohost service add $app --log="/var/log/$app/$app.log"
+
+#=================================================
+# START SYSTEMD SERVICE
+#=================================================
+ynh_script_progression --message="Starting a systemd service..."
+
+# Start a systemd service
+ynh_systemd_action --service_name=$app --action="start" --log_path="/var/log/$app/$app.log" --line_match="Starting Headphones web server"
+
+#=================================================
+# SETUP SSOWAT
+#=================================================
+ynh_script_progression --message="Configuring permissions..."
+
+# Make app public if necessary
+if [ $is_public -eq 1 ]
+then
+	# Everyone can access the app.
+	# The "main" permission is automatically created before the install script.
+	ynh_permission_update --permission="main" --add="visitors"
 fi
 
+#=================================================
+# RELOAD NGINX
+#=================================================
+ynh_script_progression --message="Reloading NGINX web server..."
 
-# Make install if localhost installation
-if [[ $app_method == "LOCAL"* ]]; then
+ynh_systemd_action --service_name=nginx --action=reload
 
-	# Check port availability
-	sudo yunohost app checkport $app_port
-	if [[ ! $? -eq 0 ]]; then
-		exit 1
-	fi
-	
-	# Make directories
-	sudo mkdir -p $app_logs_dir
-	sudo mkdir -p $app_data_dir
-	sudo mkdir -p $app_install_dir
-	
-	# Install latest version of app using the fork
-	sudo apt-get install -y git-core
-	sudo git clone $app_fork $app_install_dir
-	
-	# Install dependencies (using virtualenv)
-	if [[ $(python --version 2>&1) != Python\ 2* ]]; then
-		app_python_bin=$app_install_dir/bin/python
-		sudo apt-get install -y python-pip python-virtualenv python-dev uwsgi uwsgi-plugin-python
-		sudo virtualenv $app_install_dir
-		sudo bash -c "source $app_install_dir/bin/activate && pip install cheetah"
-	fi
-	
-	# Create app user
-	id -u $app_user &>/dev/null || sudo useradd --home-dir $app_data_dir --shell /bin/false $app_user
-	
-	# Configure daemon
-	sudo sed -i "s@USERTOCHANGE@$app_user@g" $app_src_dfts
-	sudo sed -i "s@APPDIRTOCHANGE@$app_install_dir@g" $app_src_dfts
-	sudo sed -i "s@DATADIRTOCHANGE@$app_data_dir@g" $app_src_dfts
-	sudo sed -i "s@PIDFILETOCHANGE@$app_pid_file@g" $app_src_dfts
-	sudo sed -i "s@PYTBINTOCHANGE@$app_python_bin@g" $app_src_dfts
-	sudo sed -i "s@OPTSTOCHANGE@$app_config_file@g" $app_src_dfts
-	sudo sed -i "s@PORTTOCHANGE@$app_port@g" $app_src_dfts
-	sudo cp -a $app_src_dfts /etc/default/$app_id
-	sudo cp -a $app_src_init /etc/init.d/$app_id
-	
-	# Configure app
-	sudo sed -i "s@PATHTOCHANGE@$app_path@g" $app_src_conf
-	sudo sed -i "s@PORTTOCHANGE@$app_port@g" $app_src_conf
-	sudo sed -i "s@APPDIRTOCHANGE@$app_install_dir@g" $app_src_conf
-	sudo sed -i "s@LOGSDIRTOCHANGE@$app_logs_dir@g" $app_src_conf
-	sudo cp -a $app_src_conf $app_config_file
-	
-	# Configure specifics options
-	case "$app_opts" in
-	*"Transmission"*)
-		ref_file=$(sudo sed -n -e '/^CONFIG_DIR/ s/.*\= *//p' $(find /etc/default -name '*transmission*') | sed 's/["* ]//g')/settings.json
-		ref_field=(download-dir rpc-bind-address rpc-port rpc-url rpc-username rpc-password)
-		for i in ${ref_field[*]}; do ref_value+=$(sudo sed -n -e "/$i/ s/.*\: *//p" $ref_file | sed 's/["*,]//g'); done
-		ref_value=($ref_value)
-		sudo sed -i "s@download_torrent_dir =.*@download_torrent_dir = ${ref_value[0]}@g" $app_src_conf
-		sudo sed -i "s@transmission_host =.*@transmission_host = http://${ref_value[1]}:${ref_value[2]}${ref_value[3]}@g" $app_src_conf
-		sudo sed -i "s@transmission_username =.*@transmission_username = ${ref_value[4]}@g" $app_src_conf
-		sudo sed -i "s@transmission_password =.*@transmission_password = ${ref_value[5]}@g" $app_src_conf
-		sudo sed -i "s@torrent_downloader =.*@torrent_downloader = 1@g" $app_src_conf
-		sudo sed -i "s@keep_torrent_files =.*@keep_torrent_files = 1@g" $app_src_conf
-		sudo sed -i "s@prefer_torrents =.*@prefer_torrents = 1@g" $app_src_conf
-		sudo cp -a $app_src_conf $app_config_file
-		;;
-	esac
-	
-	# Set rights
-	sudo chown -R $app_user $app_install_dir
-	sudo chown -R $app_user $app_data_dir
-	sudo chown -R $app_user $app_logs_dir
-	sudo chmod +x /etc/init.d/$app_id
-	sudo chmod +x -R $app_install_dir
-	sudo chmod +x -R $app_data_dir
-	sudo chmod +x -R $app_logs_dir
-	
-	# Add service to YunoHost's monitoring
-	sudo yunohost service add $app_id --log $app_logs_dir --status "ps aux | grep $app_id | grep -v grep"
-	
-	# Start daemon at boot
-	sudo update-rc.d $app_id defaults
-	
-	# Start service
-	sudo service $app_id start
-	
-	# Set proxy host variable
-	app_host="http://${app_local_host}:${app_port}${app_path%/}"
-	
-fi
+#=================================================
+# END OF SCRIPT
+#=================================================
 
-
-# Remove trailing "/" for next commands
-app_path=${app_path%/}
-
-# Configure Nginx 
-sudo sed -i "s@PATHTOCHANGE@$app_path@g" $app_src_nginx_conf
-sudo sed -i "s@HOSTTOCHANGE@$app_host@g" $app_src_nginx_conf
-sudo cp $app_src_nginx_conf /etc/nginx/conf.d/$app_domain.d/$app_id.conf
-
-# If app is public, add url to SSOWat conf as skipped_uris
-if [[ $app_public == "Yes" ]]; then
-	# unprotected_uris allows SSO credentials to be passed anyway.
-	sudo yunohost app setting $app_id unprotected_uris -v "/"
-fi
-	
-# Save app settings
-sudo yunohost app setting $app_id public -v "$app_public"
-sudo yunohost app setting $app_id method -v "$app_method"
-sudo yunohost app setting $app_id host -v "$app_host"
-
-# Reload Nginx and regenerate SSOwat conf
-sudo service nginx reload
-sudo yunohost app ssowatconf
+ynh_script_progression --message="Installation of $app completed"

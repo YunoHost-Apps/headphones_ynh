@@ -1,0 +1,12 @@
+[Unit]
+Description=Headphones
+
+[Service]
+Type=simple
+User=__APP__
+Group=__APP__
+WorkingDirectory=__FINALPATH__/
+ExecStart=__FINALPATH__/venv/bin/python3 __FINALPATH__/Headphones.py --config /etc/__APP__/__APP__.ini --datadir __DATADIR__ --nolaunch
+
+[Install]
+WantedBy=multi-user.target

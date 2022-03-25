@@ -1,37 +1,81 @@
 #!/bin/bash
 
-# Common variable declaration
-app_id=headphones
-app_user=headphones
-app_install_dir="/opt/yunohost/${app_id}"
-app_data_dir="/home/yunohost.app/${app_id}"
+#=================================================
+# GENERIC START
+#=================================================
+# IMPORT GENERIC HELPERS
+#=================================================
 
-# Retrieve arguments
-app_method="$(sudo yunohost app setting ${app_id} method)"
-app_domain="$(sudo yunohost app setting ${app_id} domain)"
+# Keep this path for calling _common.sh inside the execution's context of backup and restore scripts
+source ../settings/scripts/_common.sh
+source /usr/share/yunohost/helpers
 
-# The parameter $1 is the backup directory location
-# which will be compressed afterward
-app_backup_dir="$1/apps/${app_id}"
-sudo mkdir -p $app_backup_dir
+#=================================================
+# MANAGE SCRIPT FAILURE
+#=================================================
 
+ynh_clean_setup () {
+	true
+}
+# Exit if an error occurs during the execution of the script
+ynh_abort_if_errors
 
-# Backup files if localhost installation
-if [[ $app_method == "LOCAL"* ]]; then
+#=================================================
+# LOAD SETTINGS
+#=================================================
+ynh_print_info --message="Loading installation settings..."
 
-	# Backup sources
-	sudo cp -a $app_install_dir/. $app_backup_dir/sources
+app=$YNH_APP_INSTANCE_NAME
 
-	# Backup data
-	sudo cp -a $app_data_dir/. $app_backup_dir/data
-	
-	# Backup daemon config
-	sudo cp -a /etc/default/$app_id $app_backup_dir/conf/$app_id.default
-	sudo cp -a /etc/init.d/$app_id $app_backup_dir/conf/$app_id.init
-	
-fi
+final_path=$(ynh_app_setting_get --app=$app --key=final_path)
+domain=$(ynh_app_setting_get --app=$app --key=domain)
+datadir=$(ynh_app_setting_get --app=$app --key=datadir)
 
+#=================================================
+# DECLARE DATA AND CONF FILES TO BACKUP
+#=================================================
+ynh_print_info --message="Declaring files to be backed up..."
 
-# Copy Nginx and YunoHost parameters to make the script "standalone"
-sudo cp -a /etc/yunohost/apps/$app_id/. $app_backup_dir/yunohost
-sudo cp -a /etc/nginx/conf.d/$app_domain.d/$app_id.conf $app_backup_dir/nginx.conf
+#=================================================
+# BACKUP THE APP MAIN DIR
+#=================================================
+
+ynh_backup --src_path="$final_path"
+
+#=================================================
+# BACKUP THE DATA DIR
+#=================================================
+
+ynh_backup --src_path="$datadir" --is_big
+
+#=================================================
+# BACKUP THE NGINX CONFIGURATION
+#=================================================
+
+ynh_backup --src_path="/etc/nginx/conf.d/$domain.d/$app.conf"
+
+#=================================================
+# SPECIFIC BACKUP
+#=================================================
+# BACKUP LOGROTATE
+#=================================================
+
+ynh_backup --src_path="/etc/logrotate.d/$app"
+
+#=================================================
+# BACKUP SYSTEMD
+#=================================================
+
+ynh_backup --src_path="/etc/systemd/system/$app.service"
+
+#=================================================
+# BACKUP VARIOUS FILES
+#=================================================
+
+ynh_backup --src_path="/etc/$app/"
+
+#=================================================
+# END OF SCRIPT
+#=================================================
+
+ynh_print_info --message="Backup script completed for $app. (YunoHost will then actually copy those files to the archive)."
