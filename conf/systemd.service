@@ -1,13 +1,12 @@
 [Unit]
 Description=Headphones
-Wants=network.target network-online.target
-After=network.target network-online.target
 
 [Service]
-Type=forking
+Type=simple
 User=__APP__
 Group=__APP__
-ExecStart=/usr/bin/python3 __FINALPATH__/Headphones.py -d --datadir __DATADIR__ --nolaunch --config /etc/headphones/headphones.ini --port __PORT__
+WorkingDirectory=__FINALPATH__/
+ExecStart=__FINALPATH__/venv/bin/python3 __FINALPATH__/Headphones.py --config /etc/__APP__/__APP__.ini --datadir __DATADIR__ --nolaunch
 
 [Install]
 WantedBy=multi-user.target

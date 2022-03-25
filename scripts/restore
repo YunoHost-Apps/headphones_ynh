@@ -1,56 +1,149 @@
 #!/bin/bash
 
-# Common variable declaration
-app_id=headphones
-app_user=headphones
-app_install_dir="/opt/yunohost/${app_id}"
-app_data_dir="/home/yunohost.app/${app_id}"
+#=================================================
+# GENERIC START
+#=================================================
+# IMPORT GENERIC HELPERS
+#=================================================
 
-# Retrieve arguments
-app_method="$(sudo yunohost app setting ${app_id} method)"
-app_domain="$(sudo yunohost app setting ${app_id} domain)"
+# Keep this path for calling _common.sh inside the execution's context of backup and restore scripts
+source ../settings/scripts/_common.sh
+source /usr/share/yunohost/helpers
 
-# The parameter $1 is the uncompressed restore directory location
-app_backup_dir="$1/apps/${app_id}"
+#=================================================
+# MANAGE SCRIPT FAILURE
+#=================================================
 
+ynh_clean_setup () {
+	ynh_clean_check_starting
+}
+# Exit if an error occurs during the execution of the script
+ynh_abort_if_errors
 
-# Restore files if localhost installation
-if [[ $app_method == "LOCAL"* ]]; then
+#=================================================
+# LOAD SETTINGS
+#=================================================
+ynh_script_progression --message="Loading installation settings..."
 
-	# Kill app
-	sudo service $app_id stop
-	sudo killall $app_id
+app=$YNH_APP_INSTANCE_NAME
 
-	# Restore sources
-	sudo cp -a $app_backup_dir/sources/. $app_install_dir
+domain=$(ynh_app_setting_get --app=$app --key=domain)
+path_url=$(ynh_app_setting_get --app=$app --key=path)
+final_path=$(ynh_app_setting_get --app=$app --key=final_path)
+datadir=$(ynh_app_setting_get --app=$app --key=datadir)
 
-	# Restore data
-	sudo cp -a $app_backup_dir/data/. $app_data_dir
-	
-	# Restore daemon config
-	sudo cp -a $app_backup_dir/conf/$app_id.default /etc/default/$app_id 
-	sudo cp -a $app_backup_dir/conf/$app_id.init /etc/init.d/$app_id
-	
-	# Set rights
-	sudo chown -R $app_user $app_install_dir
-	sudo chown -R $app_user $app_data_dir
-	sudo chmod +x /etc/init.d/$app_id
-	sudo chmod +x -R $app_install_dir
-	sudo chmod +x -R $app_data_dir
-	
-	# Start daemon at boot
-	sudo update-rc.d $app_id defaults
-	
-	# Reload daemon
-	sudo service $app_id restart
-	
-fi
+#=================================================
+# CHECK IF THE APP CAN BE RESTORED
+#=================================================
+ynh_script_progression --message="Validating restoration parameters..."
 
+test ! -d $final_path \
+	|| ynh_die --message="There is already a directory: $final_path "
 
-# Restore Nginx and YunoHost parameters
-sudo cp -a $app_backup_dir/yunohost/. /etc/yunohost/apps/$app_id
-sudo cp -a $app_backup_dir/nginx.conf /etc/nginx/conf.d/$app_domain.d/$app_id.conf
+#=================================================
+# STANDARD RESTORATION STEPS
+#=================================================
+# RESTORE THE NGINX CONFIGURATION
+#=================================================
+ynh_script_progression --message="Restoring the NGINX web server configuration..."
 
-# Reload Nginx and regenerate SSOwat conf
-sudo service nginx reload
-sudo yunohost app ssowatconf
+ynh_restore_file --origin_path="/etc/nginx/conf.d/$domain.d/$app.conf"
+
+#=================================================
+# RECREATE THE DEDICATED USER
+#=================================================
+ynh_script_progression --message="Recreating the dedicated system user..."
+
+# Create the dedicated user (if not existing)
+ynh_system_user_create --username=$app --home_dir="$final_path"
+
+#=================================================
+# RESTORE THE APP MAIN DIR
+#=================================================
+ynh_script_progression --message="Restoring the app main directory..."
+
+ynh_restore_file --origin_path="$final_path"
+
+chmod 750 "$final_path"
+chmod -R o-rwx "$final_path"
+chown -R $app:$app "$final_path"
+chmod +x "$final_path/Headphones.py"
+
+#=================================================
+# RESTORE THE DATA DIRECTORY
+#=================================================
+ynh_script_progression --message="Restoring the data directory..."
+
+ynh_restore_file --origin_path="$datadir" --not_mandatory
+
+mkdir -p $datadir
+
+chmod 750 "$datadir"
+chmod -R o-rwx "$datadir"
+chown -R $app:$app "$datadir"
+
+#=================================================
+# SPECIFIC RESTORATION
+#=================================================
+# REINSTALL DEPENDENCIES
+#=================================================
+ynh_script_progression --message="Reinstalling dependencies..."
+
+# Define and install dependencies
+ynh_install_app_dependencies $pkg_dependencies
+
+#=================================================
+# RESTORE VARIOUS FILES
+#=================================================
+ynh_script_progression --message="Restoring various files..."
+
+ynh_restore_file --origin_path="/etc/$app/"
+
+chmod 600 "/etc/$app/$app.ini"
+chown $app:$app "/etc/$app/$app.ini"
+
+#=================================================
+# RESTORE SYSTEMD
+#=================================================
+ynh_script_progression --message="Restoring the systemd configuration..."
+
+ynh_restore_file --origin_path="/etc/systemd/system/$app.service"
+systemctl enable $app.service --quiet
+
+#=================================================
+# RESTORE THE LOGROTATE CONFIGURATION
+#=================================================
+ynh_script_progression --message="Restoring the logrotate configuration..."
+
+mkdir -p "/var/log/$app"
+chown -R $app:$app "/var/log/$app"
+ynh_restore_file --origin_path="/etc/logrotate.d/$app"
+
+#=================================================
+# INTEGRATE SERVICE IN YUNOHOST
+#=================================================
+ynh_script_progression --message="Integrating service in YunoHost..."
+
+yunohost service add $app --log="/var/log/$app/$app.log"
+
+#=================================================
+# START SYSTEMD SERVICE
+#=================================================
+ynh_script_progression --message="Starting a systemd service..."
+
+ynh_systemd_action --service_name=$app --action="start" --log_path="/var/log/$app/$app.log" --line_match="Starting Headphones web server"
+
+#=================================================
+# GENERIC FINALIZATION
+#=================================================
+# RELOAD NGINX
+#=================================================
+ynh_script_progression --message="Reloading NGINX web server..."
+
+ynh_systemd_action --service_name=nginx --action=reload
+
+#=================================================
+# END OF SCRIPT
+#=================================================
+
+ynh_script_progression --message="Restoration completed for $app"

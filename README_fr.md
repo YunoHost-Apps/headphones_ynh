@@ -11,11 +11,16 @@ Si vous n'avez pas YunoHost, regardez [ici](https://yunohost.org/#/install) pour
 
 ## Vue d'ensemble
 
-Automated music downloader for NZB and Torrent
+Headphones is an automated music downloader for NZB and Torrent, written in Python. It supports SABnzbd, NZBget, Transmission, µTorrent, Deluge and Blackhole.
+
 
 **Version incluse :** 0.6.0~ynh1
 
 
+
+## Captures d'écran
+
+![](./doc/screenshots/screenshot01.png)
 
 ## Documentations et ressources
 
