@@ -5,7 +5,7 @@ It shall NOT be edited by hand.
 
 # Headphones for YunoHost
 
-[![Integration level](https://dash.yunohost.org/integration/headphones.svg)](https://dash.yunohost.org/appci/app/headphones) ![](https://ci-apps.yunohost.org/ci/badges/headphones.status.svg) ![](https://ci-apps.yunohost.org/ci/badges/headphones.maintain.svg)  
+[![Integration level](https://dash.yunohost.org/integration/headphones.svg)](https://dash.yunohost.org/appci/app/headphones) ![Working status](https://ci-apps.yunohost.org/ci/badges/headphones.status.svg) ![Maintenance status](https://ci-apps.yunohost.org/ci/badges/headphones.maintain.svg)  
 [![Install Headphones with YunoHost](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=headphones)
 
 *[Lire ce readme en français.](./README_fr.md)*
@@ -20,29 +20,27 @@ Headphones is an automated music downloader for NZB and Torrent, written in Pyth
 
 **Shipped version:** 0.6.0~ynh1
 
-
-
 ## Screenshots
 
-![](./doc/screenshots/screenshot01.png)
+![Screenshot of Headphones](./doc/screenshots/screenshot01.png)
 
 ## Documentation and resources
 
-* Official app website: https://github.com/rembo10/headphones
-* Official user documentation: https://github.com/rembo10/headphones/wiki/Usage-guide
-* Upstream app code repository: https://github.com/rembo10/headphones
-* YunoHost documentation for this app: https://yunohost.org/app_headphones
-* Report a bug: https://github.com/YunoHost-Apps/headphones_ynh/issues
+* Official user documentation: <https://github.com/rembo10/headphones/wiki/Usage-guide>
+* Upstream app code repository: <https://github.com/rembo10/headphones>
+* YunoHost documentation for this app: <https://yunohost.org/app_headphones>
+* Report a bug: <https://github.com/YunoHost-Apps/headphones_ynh/issues>
 
 ## Developer info
 
 Please send your pull request to the [testing branch](https://github.com/YunoHost-Apps/headphones_ynh/tree/testing).
 
 To try the testing branch, please proceed like that.
-```
+
+``` bash
 sudo yunohost app install https://github.com/YunoHost-Apps/headphones_ynh/tree/testing --debug
 or
 sudo yunohost app upgrade headphones -u https://github.com/YunoHost-Apps/headphones_ynh/tree/testing --debug
 ```
 
-**More info regarding app packaging:** https://yunohost.org/packaging_apps
+**More info regarding app packaging:** <https://yunohost.org/packaging_apps>
