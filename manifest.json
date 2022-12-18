@@ -9,7 +9,6 @@
     "url": "https://github.com/rembo10/headphones",
     "upstream": {
         "license": "GPL-3.0-or-later",
-        "website": "https://github.com/rembo10/headphones",
         "userdoc": "https://github.com/rembo10/headphones/wiki/Usage-guide",
         "code": "https://github.com/rembo10/headphones"
     },
