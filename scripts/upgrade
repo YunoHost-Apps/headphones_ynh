@@ -63,14 +63,11 @@ python3 -m venv $install_dir/venv
 #=================================================
 ynh_script_progression --message="Updating a configuration file..."
 
-if [ -z "/etc/$app/headphones.ini" ]; then
-    mv /etc/$app/headphones.ini $data_dir/headphones.ini
-#else
-	ynh_add_config --template="../conf/headphones.ini" --destination="$data_dir/headphones.ini"
-fi
+mkdir -p "/etc/$app"
+ynh_add_config --template="../conf/headphones.ini" --destination="/etc/$app/headphones.ini"
 
-chmod 600 "$data_dir/headphones.ini"
-chown $app:$app "$data_dir/headphones.ini"
+chmod 600 "/etc/$app/headphones.ini"
+chown $app:$app "/etc/$app/headphones.ini"
 
 #=================================================
 # SETUP SYSTEMD
