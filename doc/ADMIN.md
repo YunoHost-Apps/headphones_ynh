@@ -1,0 +1,1 @@
+the configuration file is located : __DATA_DIR__/headphones.ini

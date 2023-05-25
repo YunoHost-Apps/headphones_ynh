@@ -26,7 +26,6 @@ ynh_script_progression --message="Restoring the app main directory..."
 
 ynh_restore_file --origin_path="$install_dir"
 
-chmod 750 "$install_dir"
 chmod -R o-rwx "$install_dir"
 chown -R $app:$app "$install_dir"
 chmod +x "$install_dir/Headphones.py"
@@ -39,16 +38,6 @@ ynh_script_progression --message="Restoring the data directory..."
 ynh_restore_file --origin_path="$data_dir" --not_mandatory
 
 chown -R $app:$app "$data_dir"
-
-#=================================================
-# RESTORE VARIOUS FILES
-#=================================================
-ynh_script_progression --message="Restoring various files..."
-
-ynh_restore_file --origin_path="/etc/$app/"
-
-chmod 600 "/etc/$app/headphones.ini"
-chown $app:$app "/etc/$app/headphones.ini"
 
 #=================================================
 # RESTORE SYSTEMD

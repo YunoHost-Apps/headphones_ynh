@@ -53,7 +53,7 @@ ynh_add_nginx_config
 #=================================================
 # INSTALL PYTHON DEPENDENCIES
 #=================================================
-#REMOVEME? ynh_script_progression --message="Installing Python dependencies..."
+ynh_script_progression --message="Installing Python dependencies..."
 
 ynh_secure_remove --file="$install_dir/venv"
 python3 -m venv $install_dir/venv
@@ -63,11 +63,11 @@ python3 -m venv $install_dir/venv
 #=================================================
 ynh_script_progression --message="Updating a configuration file..."
 
-mkdir -p "/etc/$app"
-ynh_add_config --template="../conf/headphones.ini" --destination="/etc/$app/headphones.ini"
+ynh_secure_remove --file="/etc/$app"
+ynh_add_config --template="../conf/headphones.ini" --destination="$data_dir/headphones.ini"
 
-chmod 600 "/etc/$app/headphones.ini"
-chown $app:$app "/etc/$app/headphones.ini"
+chmod 600 "$data_dir/headphones.ini"
+chown $app:$app "$data_dir/headphones.ini"
 
 #=================================================
 # SETUP SYSTEMD
