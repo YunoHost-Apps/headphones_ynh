@@ -13,7 +13,6 @@ maintainers = []
 license = "GPL-3.0-or-later"
 userdoc = "https://github.com/rembo10/headphones/wiki/Usage-guide"
 code = "https://github.com/rembo10/headphones"
-website = "https://github.com/rembo10/headphones"
 
 [integration]
 yunohost = ">= 11.1.19"
