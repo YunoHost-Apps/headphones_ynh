@@ -49,6 +49,7 @@ ram.runtime = "50M"
     [resources.install_dir]
 
     [resources.data_dir]
+    subdirs = ["cache"]
 
     [resources.permissions]
     main.url = "/"
