@@ -5,7 +5,7 @@
 #=================================================
 
 # dependencies used by the app
-pkg_dependencies="python3 python3-venv"
+#REMOVEME? pkg_dependencies="python3 python3-venv"
 
 #=================================================
 # PERSONAL HELPERS
