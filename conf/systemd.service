@@ -1,5 +1,5 @@
 [Unit]
-Description=Headphones
+Description=Headphones: Automated music downloader
 
 [Service]
 Type=simple
