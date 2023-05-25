@@ -34,10 +34,10 @@ ynh_script_progression --message="Updating a configuration file..."
 
 path=$new_path
 domain=$new_domain
-ynh_add_config --template="../conf/headphones.ini" --destination="$data_dir/headphones.ini"
+ynh_add_config --template="../conf/headphones.ini" --destination="/etc/$app/headphones.ini"
 
-chmod 600 "$data_dir/headphones.ini"
-chown $app:$app "$data_dir/headphones.ini"
+chmod 600 "/etc/$app/headphones.ini"
+chown $app:$app "/etc/$app/headphones.ini"
 
 #=================================================
 # GENERIC FINALISATION

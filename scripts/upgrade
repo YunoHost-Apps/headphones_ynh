@@ -63,8 +63,11 @@ python3 -m venv $install_dir/venv
 #=================================================
 ynh_script_progression --message="Updating a configuration file..."
 
-ynh_secure_remove --file="/etc/$app"
-ynh_add_config --template="../conf/headphones.ini" --destination="$data_dir/headphones.ini"
+if [ -z "/etc/$app/headphones.ini" ]; then
+    mv /etc/$app/headphones.ini $data_dir/headphones.ini
+#else
+	ynh_add_config --template="../conf/headphones.ini" --destination="$data_dir/headphones.ini"
+fi
 
 chmod 600 "$data_dir/headphones.ini"
 chown $app:$app "$data_dir/headphones.ini"
