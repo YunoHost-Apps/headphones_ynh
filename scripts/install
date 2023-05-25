@@ -44,10 +44,10 @@ python3 -m venv $install_dir/venv
 ynh_script_progression --message="Adding a configuration file..."
 
 mkdir -p "/etc/$app"
-ynh_add_config --template="../conf/headphones.ini" --destination="/etc/$app/$app.ini"
+ynh_add_config --template="../conf/headphones.ini" --destination="/etc/$app/headphones.ini"
 
-chmod 600 "/etc/$app/$app.ini"
-chown $app:$app "/etc/$app/$app.ini"
+chmod 600 "/etc/$app/headphones.ini"
+chown $app:$app "/etc/$app/headphones.ini"
 
 #=================================================
 # SETUP SYSTEMD

@@ -47,8 +47,8 @@ ynh_script_progression --message="Restoring various files..."
 
 ynh_restore_file --origin_path="/etc/$app/"
 
-chmod 600 "/etc/$app/$app.ini"
-chown $app:$app "/etc/$app/$app.ini"
+chmod 600 "/etc/$app/headphones.ini"
+chown $app:$app "/etc/$app/headphones.ini"
 
 #=================================================
 # RESTORE SYSTEMD
