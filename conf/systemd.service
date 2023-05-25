@@ -1,12 +1,12 @@
 [Unit]
-Description=Headphones
+Description=Headphones: Automated music downloader
 
 [Service]
 Type=simple
 User=__APP__
 Group=__APP__
-WorkingDirectory=__FINALPATH__/
-ExecStart=__FINALPATH__/venv/bin/python3 __FINALPATH__/Headphones.py --config /etc/__APP__/__APP__.ini --datadir __DATADIR__ --nolaunch
+WorkingDirectory=__INSTALL_DIR__/
+ExecStart=__INSTALL_DIR__/venv/bin/python3 __INSTALL_DIR__/Headphones.py --config /etc/__APP__/headphones.ini --datadir __DATA_DIR__ --nolaunch
 
 # Sandboxing options to harden security
 # Depending on specificities of your service/app, you may need to tweak these

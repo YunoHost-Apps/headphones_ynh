@@ -1,7 +1,0 @@
-SOURCE_URL=https://github.com/rembo10/headphones/archive/refs/tags/v0.6.0-beta.5.tar.gz
-SOURCE_SUM=b96c09fc7c384affa8beab0995447d54ed2d5bd4022278068e5ee93b71e07be8
-SOURCE_SUM_PRG=sha256sum
-SOURCE_FORMAT=tar.gz
-SOURCE_IN_SUBDIR=true
-SOURCE_FILENAME=
-SOURCE_EXTRACT=true
