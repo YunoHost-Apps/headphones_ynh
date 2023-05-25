@@ -27,7 +27,6 @@ Headphones is an automated music downloader for NZB and Torrent, written in Pyth
 
 ## Documentations et ressources
 
-* Site officiel de l’app : <https://github.com/rembo10/headphones>
 * Documentation officielle utilisateur : <https://github.com/rembo10/headphones/wiki/Usage-guide>
 * Dépôt de code officiel de l’app : <https://github.com/rembo10/headphones>
 * Documentation YunoHost pour cette app : <https://yunohost.org/app_headphones>
