@@ -1,0 +1,58 @@
+packaging_format = 2
+
+id = "headphones"
+name = "Headphones"
+description.en = "Automated music downloader for NZB and Torrent"
+description.fr = "Téléchargeur de musique automatisé pour NZB et Torrent"
+
+version = "0.6.0~ynh2"
+
+maintainers = []
+
+[upstream]
+license = "GPL-3.0-or-later"
+userdoc = "https://github.com/rembo10/headphones/wiki/Usage-guide"
+code = "https://github.com/rembo10/headphones"
+
+[integration]
+yunohost = ">= 11.1.19"
+architectures = "all"
+multi_instance = false
+ldap = false
+sso = false
+disk = "50M"
+ram.build = "900M"
+ram.runtime = "50M"
+
+[install]
+    [install.domain]
+    type = "domain"
+
+    [install.path]
+    type = "path"
+    default = "/headphones"
+
+    [install.init_main_permission]
+    type = "group"
+    default = "visitors"
+
+[resources]
+        [resources.sources.main]
+        url = "https://github.com/rembo10/headphones/archive/refs/tags/v0.6.0.tar.gz"
+        sha256 = "e96755547b6a6cd63f2a916d4bdfd5f5a3cc62e1b89db021de441c94c064ddc6"
+        autoupdate.strategy = "latest_github_tag"
+
+    [resources.ports]
+
+    [resources.system_user]
+
+    [resources.install_dir]
+
+    [resources.data_dir]
+    subdirs = ["cache"]
+
+    [resources.permissions]
+    main.url = "/"
+
+    [resources.apt]
+    packages ="python3 python3-venv"
