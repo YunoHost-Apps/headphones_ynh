@@ -19,7 +19,7 @@ If you don't have YunoHost, please consult [the guide](https://yunohost.org/#/in
 Headphones is an automated music downloader for NZB and Torrent, written in Python. It supports SABnzbd, NZBget, Transmission, µTorrent, Deluge and Blackhole.
 
 
-**Shipped version:** 0.6.0~ynh2
+**Shipped version:** 0.6.1~ynh1
 
 ## Screenshots
 
@@ -29,7 +29,7 @@ Headphones is an automated music downloader for NZB and Torrent, written in Pyth
 
 * Official user documentation: <https://github.com/rembo10/headphones/wiki/Usage-guide>
 * Upstream app code repository: <https://github.com/rembo10/headphones>
-* YunoHost documentation for this app: <https://yunohost.org/app_headphones>
+* YunoHost Store: <https://apps.yunohost.org/app/headphones>
 * Report a bug: <https://github.com/YunoHost-Apps/headphones_ynh/issues>
 
 ## Developer info
