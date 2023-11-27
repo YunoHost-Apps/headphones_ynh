@@ -46,7 +46,7 @@ ynh_script_progression --message="Adding a configuration file..."
 mkdir -p "/etc/$app"
 ynh_add_config --template="../conf/headphones.ini" --destination="/etc/$app/headphones.ini"
 
-chmod 600 "/etc/$app/headphones.ini"
+chmod 650 "/etc/$app/headphones.ini"
 chown $app:$app "/etc/$app/headphones.ini"
 
 #=================================================
