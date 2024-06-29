@@ -19,7 +19,7 @@ No se debe editar a mano.
 Headphones is an automated music downloader for NZB and Torrent, written in Python. It supports SABnzbd, NZBget, Transmission, µTorrent, Deluge and Blackhole.
 
 
-**Versión actual:** 0.6.3~ynh1
+**Versión actual:** 0.6.3~ynh2
 
 ## Capturas
 
