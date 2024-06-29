@@ -5,7 +5,7 @@ Il NE doit PAS être modifié à la main.
 
 # Headphones pour YunoHost
 
-[![Niveau d’intégration](https://dash.yunohost.org/integration/headphones.svg)](https://dash.yunohost.org/appci/app/headphones) ![Statut du fonctionnement](https://ci-apps.yunohost.org/ci/badges/headphones.status.svg) ![Statut de maintenance](https://ci-apps.yunohost.org/ci/badges/headphones.maintain.svg)
+[![Niveau d’intégration](https://dash.yunohost.org/integration/headphones.svg)](https://ci-apps.yunohost.org/ci/apps/headphones/) ![Statut du fonctionnement](https://ci-apps.yunohost.org/ci/badges/headphones.status.svg) ![Statut de maintenance](https://ci-apps.yunohost.org/ci/badges/headphones.maintain.svg)
 
 [![Installer Headphones avec YunoHost](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=headphones)
 

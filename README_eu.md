@@ -5,7 +5,7 @@ EZ editatu eskuz.
 
 # Headphones YunoHost-erako
 
-[![Integrazio maila](https://dash.yunohost.org/integration/headphones.svg)](https://dash.yunohost.org/appci/app/headphones) ![Funtzionamendu egoera](https://ci-apps.yunohost.org/ci/badges/headphones.status.svg) ![Mantentze egoera](https://ci-apps.yunohost.org/ci/badges/headphones.maintain.svg)
+[![Integrazio maila](https://dash.yunohost.org/integration/headphones.svg)](https://ci-apps.yunohost.org/ci/apps/headphones/) ![Funtzionamendu egoera](https://ci-apps.yunohost.org/ci/badges/headphones.status.svg) ![Mantentze egoera](https://ci-apps.yunohost.org/ci/badges/headphones.maintain.svg)
 
 [![Instalatu Headphones YunoHost-ekin](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=headphones)
 
