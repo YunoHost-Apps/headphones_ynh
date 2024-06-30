@@ -5,7 +5,7 @@ It shall NOT be edited by hand.
 
 # Headphones for YunoHost
 
-[![Integration level](https://dash.yunohost.org/integration/headphones.svg)](https://dash.yunohost.org/appci/app/headphones) ![Working status](https://ci-apps.yunohost.org/ci/badges/headphones.status.svg) ![Maintenance status](https://ci-apps.yunohost.org/ci/badges/headphones.maintain.svg)
+[![Integration level](https://dash.yunohost.org/integration/headphones.svg)](https://ci-apps.yunohost.org/ci/apps/headphones/) ![Working status](https://ci-apps.yunohost.org/ci/badges/headphones.status.svg) ![Maintenance status](https://ci-apps.yunohost.org/ci/badges/headphones.maintain.svg)
 
 [![Install Headphones with YunoHost](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=headphones)
 
@@ -19,7 +19,7 @@ It shall NOT be edited by hand.
 Headphones is an automated music downloader for NZB and Torrent, written in Python. It supports SABnzbd, NZBget, Transmission, µTorrent, Deluge and Blackhole.
 
 
-**Shipped version:** 0.6.3~ynh1
+**Shipped version:** 0.6.3~ynh2
 
 ## Screenshots
 

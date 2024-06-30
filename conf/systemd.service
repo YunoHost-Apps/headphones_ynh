@@ -8,6 +8,9 @@ Group=__APP__
 WorkingDirectory=__INSTALL_DIR__/
 ExecStart=__INSTALL_DIR__/venv/bin/python3 __INSTALL_DIR__/Headphones.py --config /etc/__APP__/headphones.ini --datadir __DATA_DIR__ --nolaunch
 
+# Allow headphones to write to its configuration directory despite ProtectSystem
+ReadWritePaths=/etc/__APP__
+
 # Sandboxing options to harden security
 # Depending on specificities of your service/app, you may need to tweak these
 # .. but this should be a good baseline
