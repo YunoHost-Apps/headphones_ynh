@@ -15,7 +15,8 @@ userdoc = "https://github.com/rembo10/headphones/wiki/Usage-guide"
 code = "https://github.com/rembo10/headphones"
 
 [integration]
-yunohost = ">= 11.1.19"
+yunohost = ">= 11.2.18"
+helpers_version = "2.1"
 architectures = "all"
 multi_instance = false
 ldap = false
