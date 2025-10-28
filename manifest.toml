@@ -5,7 +5,7 @@ name = "Headphones"
 description.en = "Automated music downloader for NZB and Torrent"
 description.fr = "Téléchargeur de musique automatisé pour NZB et Torrent"
 
-version = "0.6.3~ynh2"
+version = "0.6.4~ynh1"
 
 maintainers = []
 
@@ -15,7 +15,8 @@ userdoc = "https://github.com/rembo10/headphones/wiki/Usage-guide"
 code = "https://github.com/rembo10/headphones"
 
 [integration]
-yunohost = ">= 11.1.19"
+yunohost = ">= 11.2.18"
+helpers_version = "2.1"
 architectures = "all"
 multi_instance = false
 ldap = false
@@ -38,8 +39,8 @@ ram.runtime = "50M"
 
 [resources]
         [resources.sources.main]
-        url = "https://github.com/rembo10/headphones/archive/refs/tags/v0.6.3.tar.gz"
-        sha256 = "98e5c7bc2c09c689d03d92e6faff697e9cdfb48850a816d8ebdf464e60017cec"
+        url = "https://github.com/rembo10/headphones/archive/refs/tags/v0.6.4.tar.gz"
+        sha256 = "92bc5a97cf2c921e2aa9e987593efeca0360260a55774f82fe2ee0f3e48432fc"
         autoupdate.strategy = "latest_github_tag"
 
     [resources.ports]
